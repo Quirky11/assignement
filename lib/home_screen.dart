@@ -1,74 +1,95 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'controller_screen/theme_controller.dart';
+import 'controller_screen/repo_controller.dart';
 import 'repoTab_screen.dart';
 import 'galleryTab_screen.dart';
 import 'bookmark_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class CacheManager {
+  Future<void> saveData(String key, String data) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(key, data);
+  }
+
+  Future<String?> getData(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(key);
+  }
+
+  Future<void> clearCache(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(key);
+  }
+}
 
 class HomeScreen extends StatefulWidget {
-  final VoidCallback toggleTheme;
-  final bool isDarkMode;
-
-  HomeScreen({required this.toggleTheme, required this.isDarkMode});
-
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-  late PageController _pageController;
+  final ThemeController themeController = Get.find();
+  final PageController _pageController = PageController();
+  int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
-  }
-
-  void _onTabTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      _pageController.animateToPage(index, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
-    });
+    Get.put(RepoController()); // Initialize RepoController
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_selectedIndex == 0 ? 'Repositories' : 'Gallery'),
+        title: Obx(() {
+          return Text(
+            _currentIndex == 0 ? 'Repositories' : 'Gallery',
+            style: TextStyle(
+              color: themeController.isDarkMode.value ? Colors.white : Colors.black,
+            ),
+          );
+        }),
         backgroundColor: Colors.blueAccent,
         actions: [
           IconButton(
-            icon: Icon(widget.isDarkMode ? Icons.brightness_7 : Icons.brightness_2),
-            onPressed: widget.toggleTheme,
+            icon: Obx(() => Icon(
+              themeController.isDarkMode.value ? Icons.brightness_7 : Icons.brightness_2,
+            )),
+            onPressed: themeController.toggleTheme,
           ),
           IconButton(
             icon: Icon(Icons.bookmark),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => BookmarkScreen()),
-              );
+              Get.to(() => BookmarkScreen());
             },
           ),
         ],
       ),
       body: PageView(
         controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
         children: [
-          RepoTab(),
+          RepoTab(), // RepoTab observes theme changes too
           GalleryTab(),
         ],
+        onPageChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onTabTapped,
-        selectedItemColor: Colors.blueAccent,
-        unselectedItemColor: Colors.grey,
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+            _pageController.jumpToPage(index);
+          });
+        },
+        selectedItemColor: Colors.blueAccent, // Selected item color
+        unselectedItemColor: Colors.grey, // Unselected item color
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.list),
@@ -80,15 +101,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: _selectedIndex == 1
-          ? FloatingActionButton(
-        onPressed: () {
-          // Action specific to GalleryTab
-        },
-        child: Icon(Icons.add_a_photo),
-        backgroundColor: Colors.blueAccent,
-      )
-          : null,
     );
   }
 }

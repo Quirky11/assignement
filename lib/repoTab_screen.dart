@@ -1,145 +1,96 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:get/get.dart';
+import 'controller_screen/repo_controller.dart';
+import 'controller_screen/theme_controller.dart';
 import 'fileListing_screen.dart';
 import 'ownerInfo_screen.dart';
+import 'package:intl/intl.dart';
 
-class RepoTab extends StatefulWidget {
-  @override
-  _RepoTabState createState() => _RepoTabState();
-}
+class RepoTab extends StatelessWidget {
+  final RepoController repoController = Get.find();
+  final ThemeController themeController = Get.find(); // Access ThemeController
 
-class _RepoTabState extends State<RepoTab> {
-  List<dynamic> repos = [];
-  bool isLoading = true;
-  bool hasError = false;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchRepos();
-  }
-
-  Future<void> fetchRepos() async {
-    setState(() {
-      isLoading = true;
-      hasError = false;
-    });
-    try {
-      final response = await http.get(Uri.parse('https://api.github.com/gists/public'));
-      if (response.statusCode == 200) {
-        setState(() {
-          repos = json.decode(response.body);
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          hasError = true;
-        });
-      }
-    } catch (error) {
-      setState(() {
-        hasError = true;
-      });
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
+  String formatDate(String date) {
+    final DateTime dateTime = DateTime.parse(date);
+    return DateFormat('MMM dd, yyyy').format(dateTime);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : hasError
-          ? Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error, color: Colors.red, size: 60),
-            SizedBox(height: 8),
-            Text('Failed to load repositories', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: fetchRepos,
-              icon: Icon(Icons.refresh),
-              label: Text('Retry'),
-            ),
-          ],
-        ),
-      )
-          : RefreshIndicator(
-        onRefresh: fetchRepos,
-        child: ListView.builder(
-          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          itemCount: repos.length,
-          itemBuilder: (context, index) {
-            final repo = repos[index];
-            return GestureDetector(
-              onTap: () {
-                // Navigate to the FileListingScreen with repository files
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => FileListingScreen(files: repo['files']),
+    return Obx(() {
+      return Scaffold(
+        backgroundColor: themeController.isDarkMode.value ? Colors.black : Colors.white,
+        body: repoController.isLoading.value
+            ? Center(child: CircularProgressIndicator())
+            : RefreshIndicator(
+          onRefresh: repoController.fetchRepos,
+          child: ListView.builder(
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            itemCount: repoController.repos.length,
+            itemBuilder: (context, index) {
+              final repo = repoController.repos[index];
+              final createdDate = formatDate(repo['created_at']);
+              final updatedDate = formatDate(repo['updated_at']);
+              final commentCount = repo['comments'] ?? 0;
+
+              return GestureDetector(
+                onTap: () {
+                  repoController.setRepoFiles(repo['files']);
+                  Get.to(() => FileListingScreen());
+                },
+                onLongPress: () {
+                  Get.dialog(OwnerInfoPopup(ownerInfo: repo['owner']));
+                },
+                child: Container(
+                  margin: EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: themeController.isDarkMode.value ? Colors.grey[800] : Colors.grey[200],
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                );
-              },
-              onLongPress: () {
-                // Show owner information dialog
-                showDialog(
-                  context: context,
-                  builder: (context) => OwnerInfoPopup(ownerInfo: repo['owner']),
-                );
-              },
-              child: Container(
-                margin: EdgeInsets.only(bottom: 12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 6,
-                      offset: Offset(0, 3),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage: NetworkImage(repo['owner']['avatar_url'] ?? ''),
                     ),
-                  ],
-                ),
-                child: ListTile(
-                  contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(repo['owner']['avatar_url'] ?? ''),
-                  ),
-                  title: Text(
-                    repo['description'] ?? 'No Description',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 4),
-                      Text(
-                        'Created: ${repo['created_at']}',
-                        style: TextStyle(fontSize: 12),
+                    title: Text(
+                      repo['description'] ?? 'No Description',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: themeController.isDarkMode.value ? Colors.white : Colors.black,
                       ),
-                      Text(
-                        'Updated: ${repo['updated_at']}',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ],
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Created: $createdDate',
+                          style: TextStyle(
+                            color: themeController.isDarkMode.value ? Colors.white70 : Colors.black87,
+                          ),
+                        ),
+                        Text(
+                          'Updated: $updatedDate',
+                          style: TextStyle(
+                            color: themeController.isDarkMode.value ? Colors.white70 : Colors.black87,
+                          ),
+                        ),
+                        Text(
+                          'Comments: $commentCount',
+                          style: TextStyle(
+                            color: themeController.isDarkMode.value ? Colors.white70 : Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                    trailing: Icon(Icons.chevron_right, color: Colors.grey),
                   ),
-                  trailing: Icon(Icons.chevron_right, color: Colors.grey),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

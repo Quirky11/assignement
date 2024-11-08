@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class OwnerInfoPopup extends StatelessWidget {
   final Map<String, dynamic> ownerInfo;
@@ -19,7 +20,7 @@ class OwnerInfoPopup extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Get.back(), // Using GetX to close the dialog
           child: Text('Close'),
         ),
       ],
