@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'controller_screen/bookmark_controller.dart';
 
 class BookmarkScreen extends StatelessWidget {
@@ -32,10 +33,10 @@ class BookmarkScreen extends StatelessWidget {
 
               return GestureDetector(
                 onTap: () {
-                  // any functionalities can be added for on Tap such as Download Image
+                  // Add any functionalities for on tap, e.g., download image
                 },
                 onLongPress: () {
-                  // Remove image from bookmark  on long press
+                  // Remove image from bookmarks on long press
                   bookmarkController.removeBookmark(imageUrl);
                 },
                 child: Card(
@@ -43,8 +44,12 @@ class BookmarkScreen extends StatelessWidget {
                   margin: EdgeInsets.all(4),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8.0),
-                    child: Image.network(
-                      imageUrl,
+                    child: CachedNetworkImage(
+                      imageUrl: imageUrl,
+                      placeholder: (context, url) => Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
                       fit: BoxFit.cover,
                       height: (index.isEven ? 200.0 : 300.0), // Staggered view effect
                     ),

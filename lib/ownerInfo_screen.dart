@@ -10,37 +10,63 @@ class OwnerInfoPopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = Get.isDarkMode;
+    final backgroundColor = isDarkMode ? Colors.grey[900] : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
 
     return AlertDialog(
-      backgroundColor: isDarkMode ? Colors.black : Colors.white,
-      title: Text(
-        ownerInfo['login'],
-        style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      backgroundColor: backgroundColor,
+      title: Center(
+        child: Text(
+          ownerInfo['login'],
+          style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+        ),
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.network(ownerInfo['avatar_url']),
-          Text(
-            'ID: ${ownerInfo['id']}',
-            style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+          CircleAvatar(
+            radius: 50,
+            backgroundImage: NetworkImage(ownerInfo['avatar_url']),
+            backgroundColor: Colors.transparent,
           ),
-          GestureDetector(
-            onTap: () async {
+          SizedBox(height: 12),
+          Divider(color: isDarkMode ? Colors.grey[700] : Colors.grey[300]),
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 8.0),
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              'ID: ${ownerInfo['id']}',
+              style: TextStyle(color: textColor),
+            ),
+          ),
+          SizedBox(height: 10),
+          ElevatedButton.icon(
+            onPressed: () async {
               final url = Uri.parse(ownerInfo['html_url']);
               if (await launchUrl(url, mode: LaunchMode.externalApplication)) {
-                // lauches the url
+                // Launches the URL
               } else {
-                // Error handling
                 throw 'Could not launch $url';
               }
             },
-            child: Text(
-              'URL: ${ownerInfo['html_url']}',
-              style: TextStyle(
-                color: Colors.blueAccent,
-                decoration: TextDecoration.underline,
+            icon: Icon(Icons.link, color: Colors.white),
+            label: Text(
+              'View Profile',
+              style: TextStyle(color: Colors.white),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blueAccent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
           ),
         ],
