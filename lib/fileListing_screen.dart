@@ -8,7 +8,12 @@ class FileListingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final RepoController repoController = Get.find();
 
+    // Determine the background color based on the current theme
+    Color backgroundColor = Get.isDarkMode ? Colors.black : Colors.white;
+    Color textColor = Get.isDarkMode ? Colors.white : Colors.black;
+
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text('Repository Files'),
         backgroundColor: Colors.blueAccent,
@@ -43,6 +48,7 @@ class FileListingScreen extends StatelessWidget {
             }
 
             return Card(
+              color: backgroundColor,
               margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -50,15 +56,23 @@ class FileListingScreen extends StatelessWidget {
               ),
               child: ListTile(
                 leading: Icon(fileIcon, color: Colors.blueAccent, size: 30),
-                title: Text(fileName, style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text('Type: $fileType'),
+                title: Text(
+                  fileName,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
+                  ),
+                ),
+                subtitle: Text(
+                  'Type: $fileType',
+                  style: TextStyle(color: textColor),
+                ),
                 trailing: PopupMenuButton<String>(
                   onSelected: (value) {
                     if (value == 'view') {
-                      // Use GetX to navigate to FileViewScreen
                       Get.to(() => FileViewScreen(fileName: fileName, fileType: fileType));
                     } else if (value == 'download') {
-                      repoController.downloadFile(fileName,fileType);
+                      repoController.downloadFile(fileName, fileType);
                       Get.snackbar(
                         'Download',
                         '$fileName downloaded',

@@ -48,16 +48,19 @@ class _HomeScreenState extends State<HomeScreen> {
           return Text(
             _currentIndex == 0 ? 'Repositories' : 'Gallery',
             style: TextStyle(
-              color: themeController.isDarkMode.value ? Colors.white : Colors.black,
+              color: themeController.isDarkMode.value ? Colors.white : Colors
+                  .black,
             ),
           );
         }),
         backgroundColor: Colors.blueAccent,
         actions: [
           IconButton(
-            icon: Obx(() => Icon(
-              themeController.isDarkMode.value ? Icons.brightness_7 : Icons.brightness_2,
-            )),
+            icon: Obx(() =>
+                Icon(
+                  themeController.isDarkMode.value ? Icons.brightness_7 : Icons
+                      .brightness_2,
+                )),
             onPressed: themeController.toggleTheme,
           ),
           IconButton(
@@ -80,27 +83,34 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-            _pageController.jumpToPage(index);
-          });
-        },
-        selectedItemColor: Colors.blueAccent, // Selected item color
-        unselectedItemColor: Colors.grey, // Unselected item color
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'Repos',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.image),
-            label: 'Gallery',
-          ),
-        ],
-      ),
+      bottomNavigationBar: Obx(() {
+        return BottomNavigationBar(
+          backgroundColor: themeController.isDarkMode.value
+              ? Colors.black
+              : Colors.white,
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+              _pageController.jumpToPage(index);
+            });
+          },
+          selectedItemColor: Colors.blueAccent,
+          // Selected item color
+          unselectedItemColor: Colors.grey,
+          // Unselected item color
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.list),
+              label: 'Repos',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.image),
+              label: 'Gallery',
+            ),
+          ],
+        );
+      }),
     );
   }
 }

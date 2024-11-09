@@ -10,15 +10,26 @@ class FileViewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Determine the background color and text color based on the current theme
+    Color backgroundColor = Get.isDarkMode ? Colors.black : Colors.white;
+    Color textColor = Get.isDarkMode ? Colors.white : Colors.black;
+
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text(fileName),
         backgroundColor: Colors.blueAccent,
       ),
       body: Center(
         child: fileType.contains('text')
-            ? Text('Displaying text content for $fileName')
-            : Text('Cannot display content of this file type.'),
+            ? Text(
+          'Displaying text content for $fileName',
+          style: TextStyle(color: textColor),
+        )
+            : Text(
+          'Cannot display content of this file type.',
+          style: TextStyle(color: textColor),
+        ),
       ),
     );
   }

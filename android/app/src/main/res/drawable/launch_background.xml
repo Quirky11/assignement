@@ -8,6 +8,6 @@
         <bitmap
                 android:gravity="center"
                 android:src="@drawable/logo"
-        android:scaleType="centerCrop" /> <!-- "centerCrop" makes the logo larger than "fitCenter" -->
+                android:scaleType="centerCrop" /> <!-- "centerCrop" makes the logo larger than "fitCenter" -->
     </item>
 </layer-list>

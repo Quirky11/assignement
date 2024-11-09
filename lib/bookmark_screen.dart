@@ -1,34 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';  // Import the correct version
-import 'controller_screen/bookmark_controller.dart'; // Import the controller
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'controller_screen/bookmark_controller.dart';
 
 class BookmarkScreen extends StatelessWidget {
-  final BookmarkController bookmarkController = Get.put(BookmarkController()); // Initialize the controller
+  final BookmarkController bookmarkController = Get.put(BookmarkController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('Bookmarked Images'),
         backgroundColor: Colors.blueAccent,
+        automaticallyImplyLeading: false,
       ),
       body: Obx(() {
         if (bookmarkController.bookmarkedImages.isEmpty) {
           return Center(child: Text('No bookmarked images.'));
         }
 
-        return StaggeredGrid.count(
-          crossAxisCount: 4, // Number of columns in the grid
-          mainAxisSpacing: 8.0, // Vertical spacing between tiles
-          crossAxisSpacing: 8.0, // Horizontal spacing between tiles
-          children: List.generate(bookmarkController.bookmarkedImages.length, (index) {
-            final imageUrl = bookmarkController.bookmarkedImages[index];
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: MasonryGridView.count(
+            crossAxisCount: 2, // Number of columns in the grid
+            mainAxisSpacing: 8.0, // Vertical spacing between tiles
+            crossAxisSpacing: 8.0, // Horizontal spacing between tiles
+            itemCount: bookmarkController.bookmarkedImages.length,
+            itemBuilder: (context, index) {
+              final imageUrl = bookmarkController.bookmarkedImages[index];
 
-            return StaggeredGridTile.count(
-              crossAxisCellCount: 2, // Each tile spans 2 columns
-              mainAxisCellCount: index.isEven ? 2 : 1, // Alternating heights for staggered effect
-              child: GestureDetector(
+              return GestureDetector(
                 onTap: () {
                   // Handle image click if needed
                 },
@@ -38,12 +40,19 @@ class BookmarkScreen extends StatelessWidget {
                 },
                 child: Card(
                   elevation: 4,
-                  margin: EdgeInsets.all(8),
-                  child: Image.network(imageUrl, fit: BoxFit.cover),
+                  margin: EdgeInsets.all(4), // Adjusted margin for better spacing
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0), // Rounded corners
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      height: (index.isEven ? 200.0 : 300.0), // Alternate heights for staggered effect
+                    ),
+                  ),
                 ),
-              ),
-            );
-          }),
+              );
+            },
+          ),
         );
       }),
     );

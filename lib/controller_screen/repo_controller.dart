@@ -31,16 +31,11 @@ class RepoController extends GetxController {
       // If cache is available and less than 1 hour old, load it
       if (cachedRepos != null && cacheTime != null && currentTime - cacheTime < 3600000) {
         repos.value = List<Map<String, dynamic>>.from(jsonDecode(cachedRepos));
+        // Trigger background refresh
+        refreshReposInBackground();
       } else {
         // Fetch from API if cache is outdated or not available
-        final response = await http.get(Uri.parse('https://api.github.com/gists/public'));
-        if (response.statusCode == 200) {
-          repos.value = List<Map<String, dynamic>>.from(jsonDecode(response.body));
-          prefs.setString('repos_cache', response.body);
-          prefs.setInt('repos_cache_time', currentTime); // Save current time as cache time
-        } else {
-          hasError.value = true;
-        }
+        await fetchReposFromApi();
       }
     } catch (e) {
       hasError.value = true;
@@ -49,6 +44,29 @@ class RepoController extends GetxController {
     }
   }
 
+  // Fetch repositories from API and update cache
+  Future<void> fetchReposFromApi() async {
+    try {
+      final response = await http.get(Uri.parse('https://api.github.com/gists/public'));
+      if (response.statusCode == 200) {
+        repos.value = List<Map<String, dynamic>>.from(jsonDecode(response.body));
+        // Update cache
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setString('repos_cache', response.body);
+        prefs.setInt('repos_cache_time', DateTime.now().millisecondsSinceEpoch);
+      } else {
+        hasError.value = true;
+      }
+    } catch (e) {
+      hasError.value = true;
+    }
+  }
+
+  // Refresh cache in the background without blocking UI
+  Future<void> refreshReposInBackground() async {
+    await Future.delayed(Duration(seconds: 5)); // Short delay for background fetch
+    await fetchReposFromApi(); // Fetch fresh data and update cache
+  }
 
   // Fetch files for a specific repository
   Future<void> fetchFilesForRepo(String repoId) async {

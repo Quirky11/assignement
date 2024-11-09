@@ -24,26 +24,44 @@ class GalleryController extends GetxController {
       int? cacheTime = prefs.getInt('images_cache_time');
       int currentTime = DateTime.now().millisecondsSinceEpoch;
 
-      // Check cache if it exists and is less than 1 hour old (3600000 ms)
+      // Check if cache exists and is less than 1 hour old (3600000 ms)
       if (cachedImages != null && cacheTime != null && currentTime - cacheTime < 3600000) {
         // Load images from cache
         images.value = json.decode(cachedImages);
+        // Trigger background refresh
+        refreshImagesInBackground();
       } else {
         // Fetch images from API
-        final response = await http.get(Uri.parse('https://api.unsplash.com/photos?client_id=rh9Frtt0EPKYZOD0TkSq-DonWo0sl-Od90uFHEW2j60'));
-        if (response.statusCode == 200) {
-          images.value = json.decode(response.body);
-          // Update cache with new data and set current time
-          prefs.setString('images_cache', response.body);
-          prefs.setInt('images_cache_time', currentTime);
-        } else {
-          hasError.value = true;
-        }
+        await fetchImagesFromApi();
       }
     } catch (error) {
       hasError.value = true;
     } finally {
       isLoading.value = false;
     }
+  }
+
+  // Fetch images from API and update cache
+  Future<void> fetchImagesFromApi() async {
+    try {
+      final response = await http.get(Uri.parse('https://api.unsplash.com/photos?client_id=rh9Frtt0EPKYZOD0TkSq-DonWo0sl-Od90uFHEW2j60'));
+      if (response.statusCode == 200) {
+        images.value = json.decode(response.body);
+        // Update cache
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setString('images_cache', response.body);
+        prefs.setInt('images_cache_time', DateTime.now().millisecondsSinceEpoch);
+      } else {
+        hasError.value = true;
+      }
+    } catch (error) {
+      hasError.value = true;
+    }
+  }
+
+  // Refresh cache in the background without blocking UI
+  Future<void> refreshImagesInBackground() async {
+    await Future.delayed(Duration(seconds: 5)); // Short delay for background fetch
+    await fetchImagesFromApi(); // Fetch fresh data and update cache
   }
 }

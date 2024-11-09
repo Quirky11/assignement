@@ -13,18 +13,30 @@ class FullScreenImageView extends StatelessWidget {
     // Get the controller instance
     final controller = Get.put(FullScreenImageController());
 
+    // Detect the brightness to choose background color
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blueAccent,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.bookmark),
-            onPressed: () => controller.addBookmark(imageUrl), // Use GetX to add bookmark
+      body: Stack(
+        children: [
+          PhotoView(
+            imageProvider: NetworkImage(imageUrl),
+            backgroundDecoration: BoxDecoration(
+              color: isDarkMode ? Colors.black : Colors.white, // Set background based on theme
+            ),
+          ),
+          Positioned(
+            top: 20, // Adjust the position if needed
+            right: 20,
+            child: IconButton(
+              icon: Icon(
+                Icons.bookmark,
+                color: isDarkMode ? Colors.white : Colors.black, // Change icon color based on theme
+              ),
+              onPressed: () => controller.addBookmark(imageUrl), // Use GetX to add bookmark
+            ),
           ),
         ],
-      ),
-      body: PhotoView(
-        imageProvider: NetworkImage(imageUrl),
       ),
     );
   }

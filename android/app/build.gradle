@@ -20,25 +20,45 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.assignment"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 21
         targetSdk = 33
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Ensure that MultiDex is enabled if your app has a large number of methods.
+        multiDexEnabled = true // Added for large apps
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // Signing configuration for the release build.
             signingConfig = signingConfigs.debug
         }
     }
+
+    // Add the configuration for ViewBinding if you're using it in XML (optional)
+    viewBinding {
+        enabled = true
+    }
+
+    // Ensure the use of Kotlin Android Extensions if you're using them (optional)
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
-flutter {
-    source = "../.."
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1' // AppCompat to support compatibility features
+    implementation 'androidx.core:core-ktx:1.9.0' // Optional Kotlin extensions
+    implementation 'com.google.android.material:material:1.9.0' // For Material Design components (optional)
+
+    // Make sure you have the Flutter dependencies
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"  // Kotlin stdlib
+
+    // Add the necessary Firebase or other dependencies if using them (optional)
+    // implementation 'com.google.firebase:firebase-analytics'
 }
+
+// Optionally, add MultiDex support if your app exceeds the method limit
+// Also add this in the AndroidManifest.xml: android:name="androidx.multidex.MultiDexApplication"
