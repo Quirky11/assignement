@@ -23,30 +23,30 @@ class BookmarkScreen extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.all(8.0),
           child: MasonryGridView.count(
-            crossAxisCount: 2, // Number of columns in the grid
-            mainAxisSpacing: 8.0, // Vertical spacing between tiles
-            crossAxisSpacing: 8.0, // Horizontal spacing between tiles
+            crossAxisCount: 2,
+            mainAxisSpacing: 8.0,
+            crossAxisSpacing: 8.0,
             itemCount: bookmarkController.bookmarkedImages.length,
             itemBuilder: (context, index) {
               final imageUrl = bookmarkController.bookmarkedImages[index];
 
               return GestureDetector(
                 onTap: () {
-                  // Handle image click if needed
+                  // any functionalities can be added for on Tap such as Download Image
                 },
                 onLongPress: () {
-                  // Remove image on long press
+                  // Remove image from bookmark  on long press
                   bookmarkController.removeBookmark(imageUrl);
                 },
                 child: Card(
                   elevation: 4,
-                  margin: EdgeInsets.all(4), // Adjusted margin for better spacing
+                  margin: EdgeInsets.all(4),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0), // Rounded corners
+                    borderRadius: BorderRadius.circular(8.0),
                     child: Image.network(
                       imageUrl,
                       fit: BoxFit.cover,
-                      height: (index.isEven ? 200.0 : 300.0), // Alternate heights for staggered effect
+                      height: (index.isEven ? 200.0 : 300.0), // Staggered view effect
                     ),
                   ),
                 ),

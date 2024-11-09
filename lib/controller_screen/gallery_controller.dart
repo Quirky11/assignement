@@ -41,7 +41,7 @@ class GalleryController extends GetxController {
     }
   }
 
-  // Fetch images from API and update cache
+  // Fetch images from API
   Future<void> fetchImagesFromApi() async {
     try {
       final response = await http.get(Uri.parse('https://api.unsplash.com/photos?client_id=rh9Frtt0EPKYZOD0TkSq-DonWo0sl-Od90uFHEW2j60'));

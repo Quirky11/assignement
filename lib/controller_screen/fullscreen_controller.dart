@@ -16,14 +16,14 @@ class FullScreenImageController extends GetxController {
     bookmarks.value = prefs.getStringList('bookmarks') ?? [];
   }
 
-  // Add an image to bookmarks
+  // Adding an image to bookmarks
   Future<void> addBookmark(String imageUrl) async {
     final prefs = await SharedPreferences.getInstance();
     if (!bookmarks.contains(imageUrl)) {
       bookmarks.add(imageUrl);
       await prefs.setStringList('bookmarks', bookmarks);
 
-      // Show snackbar using GetX
+      // Show snackbar using GetX for successful bookmark
       Get.snackbar(
         'Success',
         'Added to Bookmarks',
@@ -31,7 +31,7 @@ class FullScreenImageController extends GetxController {
         duration: Duration(seconds: 2),
       );
     } else {
-      // Show snackbar if already bookmarked
+      //  if already bookmarked
       Get.snackbar(
         'Info',
         'Already in Bookmarks',

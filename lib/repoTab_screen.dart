@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 
 class RepoTab extends StatelessWidget {
   final RepoController repoController = Get.find();
-  final ThemeController themeController = Get.find(); // Access ThemeController
+  final ThemeController themeController = Get.find();
 
   String formatDate(String date) {
     final DateTime dateTime = DateTime.parse(date);

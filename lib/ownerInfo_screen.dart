@@ -9,7 +9,6 @@ class OwnerInfoPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Check if the theme is dark or light
     bool isDarkMode = Get.isDarkMode;
 
     return AlertDialog(
@@ -30,9 +29,9 @@ class OwnerInfoPopup extends StatelessWidget {
             onTap: () async {
               final url = Uri.parse(ownerInfo['html_url']);
               if (await launchUrl(url, mode: LaunchMode.externalApplication)) {
-                // Successfully launched
+                // lauches the url
               } else {
-                // Handle the error
+                // Error handling
                 throw 'Could not launch $url';
               }
             },

@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BookmarkController extends GetxController {
-  var bookmarkedImages = <String>[].obs; // Observable list of bookmarked images
+  var bookmarkedImages = <String>[].obs; //
 
   @override
   void onInit() {

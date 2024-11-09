@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    Get.put(RepoController()); // Initialize RepoController
+    Get.put(RepoController());
   }
 
   @override
@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: PageView(
         controller: _pageController,
         children: [
-          RepoTab(), // RepoTab observes theme changes too
+          RepoTab(),
           GalleryTab(),
         ],
         onPageChanged: (index) {
@@ -96,9 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
             });
           },
           selectedItemColor: Colors.blueAccent,
-          // Selected item color
           unselectedItemColor: Colors.grey,
-          // Unselected item color
           items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.list),

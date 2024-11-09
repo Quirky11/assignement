@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'controller_screen/theme_controller.dart';
-// Import the HomePage instead of the SplashScreen
 import 'home_screen.dart';
 
 void main() {
@@ -26,7 +25,7 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
           primaryColor: Colors.blueAccent,
         ),
-        home: HomeScreen(), // Set the HomePage as the initial screen instead of the splash screen
+        home: HomeScreen(),
       );
     });
   }

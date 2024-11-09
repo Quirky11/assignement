@@ -7,8 +7,6 @@ class FileListingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final RepoController repoController = Get.find();
-
-    // Determine the background color based on the current theme
     Color backgroundColor = Get.isDarkMode ? Colors.black : Colors.white;
     Color textColor = Get.isDarkMode ? Colors.white : Colors.black;
 
