@@ -46,8 +46,11 @@ class GalleryTab extends StatelessWidget {
             final image = galleryController.images[index];
             return GestureDetector(
               onTap: () {
-                // Getx state management for navigation
-                Get.to(FullScreenImageView(imageUrl: image['urls']['regular']));
+                // Passing the entire list of URLs and the selected index
+                Get.to(() => FullScreenImageView(
+                  imageUrls: galleryController.images.map((img) => img['urls']['regular'] as String).toList(),
+                  initialIndex: index, imageUrl: null,
+                ));
               },
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
